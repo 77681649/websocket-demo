@@ -1,0 +1,23 @@
+extends layout
+
+block style
+  link(rel='stylesheet', type="text/css", href='/stylesheets/style.less')
+
+block content
+  div(class="g-3secion")
+    header(class="g-header c-header")
+      div(class="c-left-menu")
+      h3(class="c-content")="Charts"
+      div(class="c-right-menu")
+    section(class="g-main")
+      ul(id="charts")
+    footer(class="g-footer")
+      div(class="g-justify-secion-l")
+        div(class="g-left")
+          input(id="input" class="textarea")
+        div(class="g-right")
+          button(id="submit" class="btn btn-blue")="Submit"
+
+block post_script
+  script(src="/javascripts/socket.io.js")
+  script(src="/javascripts/socket.biz.js")

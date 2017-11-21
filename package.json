@@ -1,0 +1,17 @@
+{
+  "name": "wingon-websocket",
+  "version": "1.0.0",
+  "description": "websocket",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wangxiao@ctrip.com",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^2.0.4"
+  }
+}

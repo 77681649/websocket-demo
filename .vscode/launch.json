@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "lauch-chart",
+        "program": "${workspaceRoot}/example/chart/bin/www"
+      }
+    ]
+  }
