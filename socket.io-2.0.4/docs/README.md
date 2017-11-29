@@ -11,5 +11,5 @@
   - [Client API](https://github.com/socketio/socket.io-client/blob/master/docs/API.md)
 
 #### Advanced topics
-
+  - [Rooms And Namespaces](Rooms_And_Namespaces.md)
   - [Emit cheatsheet](emit.md)

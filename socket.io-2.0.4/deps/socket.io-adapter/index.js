@@ -18,7 +18,7 @@ module.exports = Adapter;
  * @api public
  */
 
-function Adapter(nsp){
+function Adapter(nsp) {
   this.nsp = nsp;
   this.rooms = {};
   this.sids = {};
@@ -40,8 +40,8 @@ Adapter.prototype.__proto__ = Emitter.prototype;
  * @api public
  */
 
-Adapter.prototype.add = function(id, room, fn){
-  return this.addAll(id, [ room ], fn);
+Adapter.prototype.add = function (id, room, fn) {
+  return this.addAll(id, [room], fn);
 };
 
 /**
@@ -53,15 +53,21 @@ Adapter.prototype.add = function(id, room, fn){
  * @api public
  */
 
-Adapter.prototype.addAll = function(id, rooms, fn){
+Adapter.prototype.addAll = function (id, rooms, fn) {
   for (var i = 0; i < rooms.length; i++) {
     var room = rooms[i];
+
     this.sids[id] = this.sids[id] || {};
     this.sids[id][room] = true;
+
     this.rooms[room] = this.rooms[room] || Room();
     this.rooms[room].add(id);
   }
-  if (fn) process.nextTick(fn.bind(null, null));
+
+  // 调用回调函数
+  if (fn) {
+    process.nextTick(fn.bind(null, null));
+  }
 };
 
 /**
@@ -73,7 +79,7 @@ Adapter.prototype.addAll = function(id, rooms, fn){
  * @api public
  */
 
-Adapter.prototype.del = function(id, room, fn){
+Adapter.prototype.del = function (id, room, fn) {
   this.sids[id] = this.sids[id] || {};
   delete this.sids[id][room];
   if (this.rooms.hasOwnProperty(room)) {
@@ -92,7 +98,7 @@ Adapter.prototype.del = function(id, room, fn){
  * @api public
  */
 
-Adapter.prototype.delAll = function(id, fn){
+Adapter.prototype.delAll = function (id, fn) {
   var rooms = this.sids[id];
   if (rooms) {
     for (var room in rooms) {
@@ -119,7 +125,7 @@ Adapter.prototype.delAll = function(id, fn){
  * @api public
  */
 
-Adapter.prototype.broadcast = function(packet, opts){
+Adapter.prototype.broadcast = function (packet, opts) {
   var rooms = opts.rooms || [];
   var except = opts.except || [];
   var flags = opts.flags || {};
@@ -133,15 +139,23 @@ Adapter.prototype.broadcast = function(packet, opts){
   var socket;
 
   packet.nsp = this.nsp.name;
-  this.encoder.encode(packet, function(encodedPackets) {
+
+  this.encoder.encode(packet, function (encodedPackets) {
     if (rooms.length) {
-      for (var i = 0; i < rooms.length; i++) {
+      
+      for (var i = 0; i < rooms.length; i++) { // 广播到指定房间的socket
+        // 排除Adapter不拥有的房间
         var room = self.rooms[rooms[i]];
         if (!room) continue;
+        
+        // 将packet发送给房间中的所有socket
         var sockets = room.sockets;
         for (var id in sockets) {
           if (sockets.hasOwnProperty(id)) {
+            // 排除已经广播过的和被排除的socket
             if (ids[id] || ~except.indexOf(id)) continue;
+            
+            // 只要socket已连接 , 那么就发送数据报
             socket = self.nsp.connected[id];
             if (socket) {
               socket.packet(encodedPackets, packetOpts);
@@ -150,12 +164,16 @@ Adapter.prototype.broadcast = function(packet, opts){
           }
         }
       }
-    } else {
+    } else { // 广播给所有房间的socket
       for (var id in self.sids) {
         if (self.sids.hasOwnProperty(id)) {
           if (~except.indexOf(id)) continue;
+          
+          // 只要socket已连接 , 那么就发送数据报
           socket = self.nsp.connected[id];
-          if (socket) socket.packet(encodedPackets, packetOpts);
+          if (socket) {
+            socket.packet(encodedPackets, packetOpts);
+          }
         }
       }
     }
@@ -170,8 +188,8 @@ Adapter.prototype.broadcast = function(packet, opts){
  * @api public
  */
 
-Adapter.prototype.clients = function(rooms, fn){
-  if ('function' == typeof rooms){
+Adapter.prototype.clients = function (rooms, fn) {
+  if ('function' == typeof rooms) {
     fn = rooms;
     rooms = null;
   }
@@ -217,7 +235,7 @@ Adapter.prototype.clients = function(rooms, fn){
  * @param {Function} callback
  * @api public
  */
-Adapter.prototype.clientRooms = function(id, fn){
+Adapter.prototype.clientRooms = function (id, fn) {
   var rooms = this.sids[id];
   if (fn) process.nextTick(fn.bind(null, null, rooms ? Object.keys(rooms) : null));
 };
@@ -228,7 +246,7 @@ Adapter.prototype.clientRooms = function(id, fn){
 * @api private
 */
 
-function Room(){
+function Room() {
   if (!(this instanceof Room)) return new Room();
   this.sockets = {};
   this.length = 0;
@@ -241,7 +259,7 @@ function Room(){
  * @api private
  */
 
-Room.prototype.add = function(id){
+Room.prototype.add = function (id) {
   if (!this.sockets.hasOwnProperty(id)) {
     this.sockets[id] = true;
     this.length++;
@@ -255,7 +273,7 @@ Room.prototype.add = function(id){
  * @api private
  */
 
-Room.prototype.del = function(id){
+Room.prototype.del = function (id) {
   if (this.sockets.hasOwnProperty(id)) {
     delete this.sockets[id];
     this.length--;

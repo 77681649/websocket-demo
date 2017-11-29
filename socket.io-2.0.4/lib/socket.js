@@ -59,7 +59,9 @@ function Socket(nsp, client, query){
   this.nsp = nsp;
   this.server = nsp.server;
   this.adapter = this.nsp.adapter;
-  this.id = nsp.name !== '/' ? nsp.name + '#' + client.id : client.id;
+  this.id = nsp.name !== '/' 
+    ? nsp.name + '#' + client.id 
+    : client.id;
   this.client = client;
   this.conn = client.conn;
   this.rooms = {};
@@ -136,6 +138,7 @@ Socket.prototype.buildHandshake = function(query){
  */
 
 Socket.prototype.emit = function(ev){
+  // 触发内建事件
   if (~exports.events.indexOf(ev)) {
     emit.apply(this, arguments);
     return this;
@@ -219,6 +222,7 @@ Socket.prototype.packet = function(packet, opts){
   packet.nsp = this.nsp.name;
   opts = opts || {};
   opts.compress = false !== opts.compress;
+  
   this.client.packet(packet, opts);
 };
 
@@ -233,25 +237,34 @@ Socket.prototype.packet = function(packet, opts){
 
 Socket.prototype.join = function(rooms, fn){
   debug('joining room %s', rooms);
+
   var self = this;
+
   if (!Array.isArray(rooms)) {
     rooms = [rooms];
   }
+
   rooms = rooms.filter(function (room) {
     return !self.rooms.hasOwnProperty(room);
   });
+
   if (!rooms.length) {
     fn && fn(null);
     return this;
   }
+
   this.adapter.addAll(this.id, rooms, function(err){
     if (err) return fn && fn(err);
+
     debug('joined room %s', rooms);
+    
     rooms.forEach(function (room) {
       self.rooms[room] = room;
     });
+
     fn && fn(null);
   });
+
   return this;
 };
 

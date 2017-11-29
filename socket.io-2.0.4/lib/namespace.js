@@ -43,11 +43,10 @@ var emit = Emitter.prototype.emit;
 /**
  * Namespace constructor.
  *
- * @param {Server} server instance
- * @param {Socket} name
+ * @param {Server} server Server实例
+ * @param {String} name 命名空间
  * @api private
  */
-
 function Namespace(server, name){
   this.name = name;
   this.server = server;
@@ -147,6 +146,7 @@ Namespace.prototype.run = function(socket, fn){
 Namespace.prototype.to =
 Namespace.prototype.in = function(name){
   if (!~this.rooms.indexOf(name)) this.rooms.push(name);
+  
   return this;
 };
 
@@ -209,25 +209,29 @@ Namespace.prototype.remove = function(socket){
  */
 
 Namespace.prototype.emit = function(ev){
+  // 触发内建事件
   if (~exports.events.indexOf(ev)) {
     emit.apply(this, arguments);
     return this;
   }
+
   // set up packet object
   var args = Array.prototype.slice.call(arguments);
   var packet = { type: parser.EVENT, data: args };
 
+  // 当广播时,不支持回调函数
   if ('function' == typeof args[args.length - 1]) {
     throw new Error('Callbacks are not supported when broadcasting');
   }
 
-  var rooms = this.rooms.slice(0);
-  var flags = Object.assign({}, this.flags);
+  var rooms = this.rooms.slice(0);            // clone rooms
+  var flags = Object.assign({}, this.flags);  // clone flags
 
   // reset flags
   this.rooms = [];
   this.flags = {};
 
+  // 广播 packet
   this.adapter.broadcast(packet, {
     rooms: rooms,
     flags: flags
