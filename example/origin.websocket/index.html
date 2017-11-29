@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Send Volatile Message</title>
+</head>
+
+<body>
+</body>
+<script src="/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let socket = io('ws://localhost:3000')
+
+    socket.on('connect', function () {
+      socket.send('hello')
+      socket.on('message', function (message) {
+        console.log('from server :', message)
+      })
+    })
+  })
+</script>
+
+</html>

@@ -1,11 +1,24 @@
 {
     "version": "0.2.0",
     "configurations": [
+
       {
         "type": "node",
         "request": "launch",
-        "name": "lauch-chart",
+        "name": "launch-chart",
         "program": "${workspaceRoot}/example/chart/bin/www"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "launch-volatile.message",
+        "program": "${workspaceRoot}/example/volatile.message/app.js"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "launch-ack.message",
+        "program": "${workspaceRoot}/example/ack.message/app.js"
       }
     ]
   }

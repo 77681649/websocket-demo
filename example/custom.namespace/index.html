@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Send Volatile Message</title>
+</head>
+
+<body>
+</body>
+<script src="/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let newsSocket = io('/news')
+    let chatSocket = io('/chat')
+
+      newsSocket.emit('hello')
+      chatSocket.emit('hello')
+  })
+</script>
+
+</html>

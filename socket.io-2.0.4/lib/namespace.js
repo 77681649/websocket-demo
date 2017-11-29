@@ -57,6 +57,7 @@ function Namespace(server, name){
   this.ids = 0;
   this.rooms = [];
   this.flags = {};
+  
   this.initAdapter();
 }
 

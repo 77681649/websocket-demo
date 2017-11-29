@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Sync Server Time</title></head>
+<body>
+  <div id="date"></div>
+</body>
+<script src="/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let $date = document.getElementById('date')
+    let socket = io()
+
+    socket.on('date', function (message) {
+      $date.innerText = message
+    })
+  })
+</script>
+
+</html>
