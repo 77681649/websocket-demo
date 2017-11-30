@@ -81,11 +81,13 @@ _命名空间是Socket.IO协议的实现细节,它与底层传输的真实URL(�
 # Rooms
 Within each namespace, you can also define arbitrary channels that sockets can join and leave.
 
-_在每个命名空间中,你还可以定义socket可以随意进出的频道._
+_在每个命名空间中,你还可以定义socket可以随意进出的频道(即房间)._
 
 
 ## Joining and leaving
 You can call join to subscribe the socket to a given channel:
+
+_你能通过调用"socket.join()"来订阅一个指定的频道:_
 
 _你能调用"join"方法_
 
@@ -97,11 +99,14 @@ io.on('connection', function(socket){
 
 And then simply use to or in (they are the same) when broadcasting or emitting:
 
-__(它们是相同的)
+_然后,当广播或namespace.emit时简单地使用"to"或"in"实现将事件发送到指定频道:_
 
 ```javascript
 
 io.to('some room').emit('some event');
+io.in('some room').emit('some event');
+
+socket.in('some room').broadcast.emit('some event');
 
 ```
 

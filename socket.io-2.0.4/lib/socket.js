@@ -181,19 +181,6 @@ Socket.prototype.emit = function(ev){
   return this;
 };
 
-/**
- * Targets a room when broadcasting.
- *
- * @param {String} name
- * @return {Socket} self
- * @api public
- */
-
-Socket.prototype.to =
-Socket.prototype.in = function(name){
-  if (!~this._rooms.indexOf(name)) this._rooms.push(name);
-  return this;
-};
 
 /**
  * Sends a `message` event.
@@ -227,6 +214,20 @@ Socket.prototype.packet = function(packet, opts){
 };
 
 /**
+ * Targets a room when broadcasting.
+ *
+ * @param {String} name
+ * @return {Socket} self
+ * @api public
+ */
+
+Socket.prototype.to =
+Socket.prototype.in = function(name){
+  if (!~this._rooms.indexOf(name)) this._rooms.push(name);
+  return this;
+};
+
+/**
  * Joins a room.
  *
  * @param {String|Array} room or array of rooms
@@ -244,10 +245,12 @@ Socket.prototype.join = function(rooms, fn){
     rooms = [rooms];
   }
 
+  // 过滤掉已经加入过的房间
   rooms = rooms.filter(function (room) {
     return !self.rooms.hasOwnProperty(room);
   });
 
+  // 处理为空的情况 , 直接调用回调函数
   if (!rooms.length) {
     fn && fn(null);
     return this;

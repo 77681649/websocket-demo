@@ -19,6 +19,12 @@
         "request": "launch",
         "name": "launch-ack.message",
         "program": "${workspaceRoot}/example/ack.message/app.js"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "launch-broadcast.message.to.room",
+        "program": "${workspaceRoot}/example/broadcast.message.to.room/app.js"
       }
     ]
   }

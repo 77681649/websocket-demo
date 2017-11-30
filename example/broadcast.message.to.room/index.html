@@ -10,11 +10,11 @@
 <script src="/socket.io.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    let newsSocket = io('/news')
-    let chatSocket = io('/chat')
+    let socket = io()
 
-      newsSocket.emit('hello')
-      chatSocket.emit('hello')
+    socket.on('message', function (data) {
+      console.log(data)
+    })
   })
 </script>
 
