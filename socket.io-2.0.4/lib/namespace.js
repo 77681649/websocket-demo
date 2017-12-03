@@ -116,9 +116,11 @@ Namespace.prototype.use = function(fn){
  */
 
 Namespace.prototype.run = function(socket, fn){
-  var fns = this.fns.slice(0);
-  if (!fns.length) return fn(null);
+  var fns = this.fns.slice(0);      // clone
 
+  if (!fns.length) return fn(null); // 没有中间件直接返回
+
+  // 异步串行按use顺序依次执行所有中间件 , 当遇到错误时停止
   function run(i){
     fns[i](socket, function(err){
       // upon error, short-circuit
@@ -159,11 +161,14 @@ Namespace.prototype.in = function(name){
 
 Namespace.prototype.add = function(client, query, fn){
   debug('adding socket to nsp %s', this.name);
+  
   var socket = new Socket(this, client, query);
   var self = this;
+
   this.run(socket, function(err){
     process.nextTick(function(){
       if ('open' == client.conn.readyState) {
+        // 发送 `error` 数据包
         if (err) return socket.error(err.data || err.message);
 
         // track socket
@@ -184,6 +189,7 @@ Namespace.prototype.add = function(client, query, fn){
       }
     });
   });
+  
   return socket;
 };
 

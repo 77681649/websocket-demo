@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Send Volatile Message</title>
+</head>
+
+<body>
+  <div id="date"></div>
+</body>
+<script src="/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let socket = io()
+    
+    socket.on('time',function(date){
+      document.getElementById('date').innerText = date
+    })
+  })
+</script>
+
+</html>

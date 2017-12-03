@@ -25,6 +25,19 @@
         "request": "launch",
         "name": "launch-broadcast.message.to.room",
         "program": "${workspaceRoot}/example/broadcast.message.to.room/app.js"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "launch-emit.any.process-server",
+        "program": "${workspaceRoot}/example/emit.any.process/server.js"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "launch-emit.any.process-client",
+        "program": "${workspaceRoot}/example/emit.any.process/client.js"
       }
+      
     ]
   }

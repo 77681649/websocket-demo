@@ -12,6 +12,8 @@
   "author": "wangxiao@ctrip.com",
   "license": "ISC",
   "dependencies": {
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "socket.io-emitter": "^3.1.1",
+    "socket.io-redis": "^5.2.0"
   }
 }

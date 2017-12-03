@@ -27,8 +27,8 @@ module.exports = Server;
  * Socket.IO client source.
  */
 
-var clientSource = undefined;
-var clientSourceMap = undefined;
+var clientSource = undefined;     // client.js      字节流
+var clientSourceMap = undefined;  // client.js.map  字节流
 
 /**
  * Server constructor.
@@ -56,6 +56,7 @@ function Server(srv, opts) {
 
   opts = opts || {};
 
+  // 初始化参数
   this.nsps = {};
   this.path(opts.path || '/socket.io');
   this.serveClient(false !== opts.serveClient);
@@ -64,9 +65,10 @@ function Server(srv, opts) {
   this.adapter(opts.adapter || Adapter);
   this.origins(opts.origins || '*:*');
 
-  // 创建一个
+  // 创建默认的命名空间
   this.sockets = this.of('/');
 
+  // 连接服务器
   if (srv) {
     this.attach(srv, opts);
   }
@@ -74,7 +76,8 @@ function Server(srv, opts) {
 
 /**
  * Sets/gets whether client code is being served.
- *
+ * 
+ * 
  * @param {Boolean} v whether to serve client code
  * @return {Server|Boolean} self when setting or value when getting
  * @api public
@@ -83,6 +86,7 @@ function Server(srv, opts) {
 Server.prototype.serveClient = function (v) {
   if (!arguments.length) return this._serveClient;
   this._serveClient = v;
+
   var resolvePath = function (file) {
     var filepath = path.resolve(__dirname, './../../', file);
     if (exists(filepath)) {
@@ -235,20 +239,24 @@ Server.prototype.listen =
     // set origins verification
     opts.allowRequest = opts.allowRequest || this.checkRequest.bind(this);
 
+    // 如果命名空间存在中间 , 那么直接初始化引擎,无需设置"CONNECT"包
     if (this.sockets.fns.length > 0) {
       this.initEngine(srv, opts);
       return this;
     }
 
+    // 准备"CONNECT"包 , 初始化引擎
     var self = this;
     var connectPacket = { type: parser.CONNECT, nsp: '/' };
     this.encoder.encode(connectPacket, function (encodedPacket) {
       // the CONNECT packet will be merged with Engine.IO handshake,
       // to reduce the number of round trips
+      // "CONNECT"packet将和Engie.IO握手数据报合并, 以减少数据往返次数
       opts.initialPacket = encodedPacket;
 
       self.initEngine(srv, opts);
     });
+
     return this;
   };
 
@@ -327,6 +335,8 @@ Server.prototype.attachServe = function (srv) {
   var urlMap = this._path + '/socket.io.js.map';
   var evs = srv.listeners('request').slice(0);
   var self = this;
+
+  // 代理server的request事件处理
   srv.removeAllListeners('request');
   srv.on('request', function (req, res) {
     if (0 === req.url.indexOf(urlMap)) {
@@ -365,6 +375,7 @@ Server.prototype.serve = function (req, res) {
   }
 
   debug('serve client source');
+
   res.setHeader('Content-Type', 'application/javascript');
   res.setHeader('ETag', expectedEtag);
   res.writeHead(200);
@@ -450,6 +461,7 @@ Server.prototype.of = function (name, fn) {
     this.nsps[name] = nsp;
   }
 
+  // 添加listener
   if (fn) nsp.on('connect', fn);
 
   return nsp;
@@ -463,9 +475,11 @@ Server.prototype.of = function (name, fn) {
  */
 
 Server.prototype.close = function (fn) {
-  for (var id in this.nsps['/'].sockets) {
-    if (this.nsps['/'].sockets.hasOwnProperty(id)) {
-      this.nsps['/'].sockets[id].onclose();
+  let sockets = this.nsps['/'].sockets
+
+  for (var id in sockets) {
+    if (sockets.hasOwnProperty(id)) {
+      sockets[id].onclose();
     }
   }
 

@@ -130,7 +130,8 @@ Encoder.prototype.encode = function(obj, callback){
 
   debug('encoding packet %j', obj);
 
-  if (exports.BINARY_EVENT === obj.type || exports.BINARY_ACK === obj.type) {
+  if (exports.BINARY_EVENT === obj.type || 
+      exports.BINARY_ACK === obj.type) {
     encodeAsBinary(obj, callback);
   }
   else {

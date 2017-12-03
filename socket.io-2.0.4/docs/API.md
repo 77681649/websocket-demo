@@ -71,10 +71,13 @@ Exposed by `require('socket.io')`.
 
 #### new Server(httpServer[, options])
 
-  - `httpServer` _(http.Server)_ the server to bind to.
+  - `httpServer` _(http.Server)_ the server to bind to. 
+  - `httpServer` _(http.Server)_ _绑定的服务器._
   - `options` _(Object)_
     - `path` _(String)_: name of the path to capture (`/socket.io`)
+    - `path` _(String)_: 捕捉的path (`/socket.io`)
     - `serveClient` _(Boolean)_: whether to serve the client files (`true`)
+    - `serveClient` _(Boolean)_: 是否提供客户端文件 (`true`)
     - `adapter` _(Adapter)_: the adapter to use. Defaults to an instance of the `Adapter` that ships with socket.io which is memory based. See [socket.io-adapter](https://github.com/socketio/socket.io-adapter)
     - `origins` _(String)_: the allowed origins (`*`)
     - `parser` _(Parser)_: the parser to use. Defaults to an instance of the `Parser` that ships with socket.io. See [socket.io-parser](https://github.com/socketio/socket.io-parser).
@@ -90,16 +93,24 @@ const io = new Server();
 
 The same options passed to socket.io are always passed to the `engine.io` `Server` that gets created. See engine.io [options](https://github.com/socketio/engine.io#methods-1) as reference.
 
-Among those options:
+_传给socket.io的参数,会原封不动的传递给它创建的"engine.io"服务._
 
+Among those options:
+_其中的一些属性:_
   - `pingTimeout` _(Number)_: how many ms without a pong packet to consider the connection closed (`60000`)
+  - `pingTimeout` _(Number)_: 多少毫秒没有收到"ping"数据报时,考虑关闭连接 (`60000`)
   - `pingInterval` _(Number)_: how many ms before sending a new ping packet (`25000`).
+  - `pingInterval` _(Number)_: 隔多少毫秒之后发送新的"ping"包 (`25000`).
 
 Those two parameters will impact the delay before a client knows the server is not available anymore. For example, if the underlying TCP connection is not closed properly due to a network issue, a client may have to wait up to `pingTimeout + pingInterval` ms before getting a `disconnect` event.
+
+-这两个参数将影响一个客户端知道服务器不再可用之前的延时时间.例如,如果TCP连接在网络异常时断开,一个客户端可能必须等待"pingTimeout+pingInterval"毫秒之后,才会触发"disconnect"事件
 
   - `transports` _(Array<String>)_: transports to allow connections to (`['polling', 'websocket']`).
 
 **Note:** The order is important. By default, a long-polling connection is established first, and then upgraded to WebSocket if possible. Using `['websocket']` means there will be no fallback if a WebSocket connection cannot be opened.
+
+_**注意**:顺序很重要.默认情况下,首先建立一个长连接,然后尝试升级到websocket.如果使用["websocket"]的话,如果WebSokcet不可用,将不会有后备方案._
 
 ```js
 const server = require('http').createServer();
@@ -180,6 +191,8 @@ The default (`/`) namespace.
 
 If `value` is `true` the attached server (see `Server#attach`) will serve the client files. Defaults to `true`. This method has no effect after `attach` is called. If no arguments are supplied this method returns the current value.
 
+_如果value=true,那么将向服务器追加提供client文件的处理器.默认为ture.这个方法在调用"attach"之后将失效效果.如果没有提供参数,该方法将返回当前值._
+
 ```js
 // pass a server and the `serveClient` option
 const io = require('socket.io')(http, { serveClient: false });
@@ -196,6 +209,8 @@ io.attach(http);
   - **Returns** `Server|String`
 
 Sets the path `value` under which `engine.io` and the static files will be served. Defaults to `/socket.io`. If no arguments are supplied this method returns the current value.
+
+设置"engine.io"和(客户端)静态文件的访问路径.默认值为"/socket/io".如果没有提供参数,该方法将返回当前值.
 
 ```js
 const io = require('socket.io')();
@@ -214,6 +229,8 @@ const socket = io({
 
 Sets the adapter `value`. Defaults to an instance of the `Adapter` that ships with socket.io which is memory based. See [socket.io-adapter](https://github.com/socketio/socket.io-adapter). If no arguments are supplied this method returns the current value.
 
+_设置适配器的值.默认情况下,是一个基于内容的socket.io Adapater的实例.如果没有提供参数,那么调用该方法将返回当前值._
+
 ```js
 const io = require('socket.io')(3000);
 const redis = require('socket.io-redis');
@@ -227,6 +244,8 @@ io.adapter(redis({ host: 'localhost', port: 6379 }));
 
 Sets the allowed origins `value`. Defaults to any origins being allowed. If no arguments are supplied this method returns the current value.
 
+_设置允许访问的来源的值.默认情况下,允许所有来源访问.如果没有提供参数,那么调用该方法将返回当前值._
+
 ```js
 io.origins(['foo.example.com:443']);
 ```
@@ -238,10 +257,20 @@ io.origins(['foo.example.com:443']);
 
 Provides a function taking two arguments `origin:String` and `callback(error, success)`, where `success` is a boolean value indicating whether origin is allowed or not.
 
-__Potential drawbacks__:
+_提供一个接收两个参数`origin:String` 和 `callback(error, success)` ,其中`success`是一个布尔值,用来表示origin是否允许访问._
+
+__Potential drawbacks__: 潜在缺陷
 * in some situations, when it is not possible to determine `origin` it may have value of `*`
+
+_* 某些情况下,当不可能确定"origin"时,它可能具有"*"的值_
+
 * As this function will be executed for every request, it is advised to make this function work as fast as possible
+
+_* 由于每个请求都会调用该函数,所有建议使函数尽可能的高效._
+
 * If `socket.io` is used together with `Express`, the CORS headers will be affected only for `socket.io` requests. For Express you can use [cors](https://github.com/expressjs/cors).
+
+_* 如果`socket.io`是与`Express`一起工作,CROS头只会受到`socket.io`请求的影响._
 
 ```js
 io.origins((origin, callback) => {
@@ -259,12 +288,17 @@ io.origins((origin, callback) => {
 
 Attaches the `Server` to an engine.io instance on `httpServer` with the supplied `options` (optionally).
 
+_通过提供的`options`,在`httpServer`基础之上,建立`Server`与engie.io实例上的连接._
+
 #### server.attach(port[, options])
 
   - `port` _(Number)_ the port to listen on
   - `options` _(Object)_
 
 Attaches the `Server` to an engine.io instance on a new http.Server with the supplied `options` (optionally).
+
+_通过提供的`options`,在创建的新的http.Server基础之上,建立`Server`与engie.io实例上的连接._
+__
 
 #### server.listen(httpServer[, options])
 
@@ -281,6 +315,8 @@ Synonym of [server.attach(port[, options])](#serverattachport-options).
 
 Advanced use only. Binds the server to a specific engine.io `Server` (or compatible API) instance.
 
+_仅限高级用法.将`Server`绑定到特定的engie.io实例(或实现兼容接口的实例)._
+
 #### server.onconnection(socket)
 
   - `socket` _(engine.Socket)_
@@ -288,12 +324,16 @@ Advanced use only. Binds the server to a specific engine.io `Server` (or compati
 
 Advanced use only. Creates a new `socket.io` client from the incoming engine.io (or compatible API) `Socket`.
 
+_仅限高级用法.创建一个新的来自engine.io的`socket.io`客户端(或实现兼容接口的实例)._
+
 #### server.of(nsp)
 
   - `nsp` _(String)_
   - **Returns** `Namespace`
 
 Initializes and retrieves the given `Namespace` by its pathname identifier `nsp`. If the namespace was already initialized it returns it immediately.
+
+_通过路径标志符`nsp`创建并返回一个给定的`Namespace`.如果命名空间已经实例化过,那么立即返回对应的实例_
 
 ```js
 const adminNamespace = io.of('/admin');
@@ -304,6 +344,8 @@ const adminNamespace = io.of('/admin');
   - `callback` _(Function)_
 
 Closes the socket.io server. The `callback` argument is optional and will be called when all connections are closed.
+
+_关闭socket.io服务器.`callback`参数是可选的,当所有连接关闭之后被调用_
 
 ```js
 const Server = require('socket.io');
@@ -325,24 +367,34 @@ Overwrites the default method to generate your custom socket id.
 
 The function is called with a node request object (`http.IncomingMessage`) as first parameter.
 
+_覆盖默认方法来生成自定义的socket#id._
+
+_调用这个函数会接收到一个节点请求对象作为第一个参数._
+
 ```js
 io.engine.generateId = (req) => {
   return "custom:id:" + custom_id++; // custom id must be unique
 }
 ```
 
-### Namespace
+### Namespace 命名空间
 
 Represents a pool of sockets connected under a given scope identified
 by a pathname (eg: `/chat`).
 
+_表示在通过pathname标识的指定范围内的socket的连接池.(比如 : `/chat`)._
+
 A client always connects to `/` (the main namespace), then potentially connect to other namespaces (while using the same underlying connection).
 
-#### namespace.name
+_客户端总是先连接到命名空间`/`(主命名空间),然后才可能连接到其他的命名空间(使用同一底层TCP连接)._
+
+#### namespace.name 命名空间的名称
 
   * _(String)_
 
 The namespace identifier property.
+
+_命名空间的标识属性._
 
 #### namespace.connected
 
@@ -350,13 +402,19 @@ The namespace identifier property.
 
 The hash of `Socket` objects that are connected to this namespace, indexed by `id`.
 
-#### namespace.adapter
+_连接到这个命名空间的已连接上的`Socket`对象字典,通过socket的`id`进行索引._
+
+#### namespace.adapter 
 
   * _(Adapter)_
 
 The `Adapter` used for the namespace. Useful when using the `Adapter` based on [Redis](https://github.com/socketio/socket.io-redis), as it exposes methods to manage sockets and rooms accross your cluster.
 
+_用于命名空间的适配器.当使用基于Redis的`Adapter`时很有用,因为它暴露方法去管理访问集群的socket和room._
+
 **Note:** the adapter of the main namespace can be accessed with `io.of('/').adapter`.
+
+_**提示** 主命名空间的adapter能使用`io.of('/').adapter`访问_
 
 #### namespace.to(room)
 
@@ -365,7 +423,11 @@ The `Adapter` used for the namespace. Useful when using the `Adapter` based on [
 
 Sets a modifier for a subsequent event emission that the event will only be _broadcasted_ to clients that have joined the given `room`.
 
+_为随后的发射的事件设置一个修饰器,使得该事件仅广播给加入了给定`room`的客户端._
+
 To emit to multiple rooms, you can call `to` several times.
+
+_多次调用`to`可以将事件发送到多个room._
 
 ```js
 const io = require('socket.io')();
@@ -385,6 +447,8 @@ Synonym of [namespace.to(room)](#namespacetoroom).
 
 Emits an event to all connected clients. The following two are equivalent:
 
+_向所有连接上的客户端发送事件.以下两个是等价的:_
+
 ```js
 const io = require('socket.io')();
 io.emit('an event sent to all connected clients'); // main namespace
@@ -395,11 +459,15 @@ chat.emit('an event sent to all connected clients in chat namespace');
 
 **Note:** acknowledgements are not supported when emitting from namespace.
 
+_**注意** 从命名空间发送的消息不支持"确认"机制._
+
 #### namespace.clients(callback)
 
   - `callback` _(Function)_
 
 Gets a list of client IDs connected to this namespace (across all nodes if applicable).
+
+_获得由连接到该命名空间的客户端组成的列表()._
 
 ```js
 const io = require('socket.io')();
@@ -433,7 +501,11 @@ io.clients((error, clients) => {
 
 Registers a middleware, which is a function that gets executed for every incoming `Socket`, and receives as parameters the socket and a function to optionally defer execution to the next registered middleware.
 
+_注册一个中间件,中间件是一个当有`Socket`接进来时都会得到执行的函数,它接收socket和一个可以可控的延迟执行下一个注册中间件的函数作为参数._
+
 Errors passed to middleware callbacks are sent as special `error` packets to clients.
+
+_传递给中间件回调函数的错误,将会作为特殊的`error`数据报发送给客户端._
 
 ```js
 io.use((socket, next) => {
@@ -466,6 +538,8 @@ Synonym of [Event: 'connect'](#event-connect).
 
 Sets a modifier for a subsequent event emission that the event data may be lost if the clients are not ready to receive messages (because of network slowness or other issues, or because they’re connected through long polling and is in the middle of a request-response cycle).
 
+_为随后发送的事件设置一个修饰符,即如果客户端没有准备好接收数据(可能是因为网络慢或其他原因,或是因为他们一直处于长轮询的一个request-response循环的中),允许丢失事件数据._
+
 ```js
 io.volatile.emit('an event', { some: 'data' }); // the clients may or may not receive it
 ```
@@ -473,6 +547,8 @@ io.volatile.emit('an event', { some: 'data' }); // the clients may or may not re
 #### Flag: 'local'
 
 Sets a modifier for a subsequent event emission that the event data will only be _broadcast_ to the current node (when the [Redis adapter](https://github.com/socketio/socket.io-redis) is used).
+
+_为随后发送的事件设置一个修饰符,事件数据只会发送广播到当前节点(当使用redis adapter时)_
 
 ```js
 io.local.emit('an event', { some: 'data' });
